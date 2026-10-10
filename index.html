@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HGZY Aviator AI Signal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0b0e14; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+    .card { background: #161b26; border: 1px solid #283046; border-radius: 16px; width: 100%; max-width: 420px; padding: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; }
+    h2 { color: #e11d48; margin-bottom: 8px; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+    p.sub { font-size: 13px; color: #8c9ba5; margin-bottom: 20px; }
+    
+    /* Login Box */
+    .input-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 16px; margin-bottom: 15px; text-align: center; outline: none; }
+    .input-box:focus { border-color: #e11d48; }
+    .btn { width: 100%; padding: 12px; background: #e11d48; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+    .btn:active { transform: scale(0.98); }
+    .err-msg { color: #f43f5e; font-size: 13px; margin-top: 10px; display: none; }
+
+    /* Signal Dashboard */
+    #dashboard { display: none; }
+    .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+    .status-waiting { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b55; }
+    .status-active { background: #10b98122; color: #10b981; border: 1px solid #10b98155; }
+    .signal-box { background: #0b0e14; border: 1px solid #1e293b; border-radius: 12px; padding: 18px; margin-bottom: 15px; }
+    .target-val { font-size: 38px; font-weight: 800; color: #38bdf8; margin: 8px 0; text-shadow: 0 0 15px rgba(56,189,248,0.3); }
+    .grid { display: flex; justify-content: space-between; margin-top: 12px; font-size: 14px; color: #94a3b8; }
+    .grid span { color: #fff; font-weight: bold; }
+    .result-box { padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 15px; font-size: 15px; }
+    .res-win { background: #064e3b; color: #34d399; border: 1px solid #059669; }
+    .res-loss { background: #4c0519; color: #fb7185; border: 1px solid #e11d48; }
+    .timer-text { font-size: 13px; color: #64748b; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="loginBox">
+    <h2>HGZY VIP Access</h2>
+    <p class="sub">সিগন্যাল ড্যাশবোর্ডে প্রবেশ করতে সিকিউরিটি পাসওয়ার্ড দিন</p>
+    <input type="password" id="passInput" class="input-box" placeholder="পাসওয়ার্ড লিখুন...">
+    <button class="btn" onclick="checkPass()">ENTER SIGNAL ROOM</button>
+    <div id="errMsg" class="err-msg">ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন।</div>
+  </div>
+
+  <div class="card" id="dashboard">
+    <h2>HGZY AVIATOR AI</h2>
+    <div id="statusBadge" class="status-badge status-waiting">অপেক্ষমাণ...</div>
+    
+    <div class="signal-box">
+      <div style="font-size: 13px; color: #94a3b8;">টার্গেট মাল্টিপ্লায়ার</div>
+      <div id="targetOdd" class="target-val">--.--x</div>
+      <div class="grid">
+        <div>সেফ পয়েন্ট: <span id="safeOdd">--</span></div>
+        <div>একুরেসি: <span id="accVal">--</span></div>
+      </div>
+      <div class="grid" style="margin-top: 6px;">
+        <div>মোড: <span id="modeText">--</span></div>
+        <div>স্টেপ: <span id="stepText">--</span></div>
+      </div>
+    </div>
+
+    <div id="resultBox" class="result-box" style="display: none;"></div>
+    <div id="timerText" class="timer-text">রাউন্ড শুরু হওয়ার অপেক্ষায়...</div>
+  </div>
+
+  <script>
+    // ডিফল্ট পাসওয়ার্ড (এটি আপনি পরিবর্তন করতে পারেন)
+    const ACCESS_KEY = "HGZY777";
+
+    function checkPass() {
+      const pass = document.getElementById("passInput").value;
+      if (pass === ACCESS_KEY) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        startEngine();
+      } else {
+        document.getElementById("errMsg").style.display = "block";
+      }
+    }
+
+    let winStreakLimit = Math.floor(Math.random() * 2) + 5; // ৫ থেকে ৬
+    let lossStreakLimit = Math.floor(Math.random() * 2) + 2; // ২ থেকে ৩
+    let currentWinCount = 0;
+    let currentLossStep = 0;
+    let state = "WIN_PHASE"; // WIN_PHASE -> LOSS_PHASE -> RECOVERY
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function startEngine() {
+      while(true) {
+        let target, safe, acc, mode, step;
+        let isWinRound = false;
+
+        if (state === "WIN_PHASE") {
+          currentWinCount++;
+          target = (Math.random() * (2.40 - 1.65) + 1.65).toFixed(2);
+          safe = (target - 0.20).toFixed(2);
+          acc = Math.floor(Math.random() * 6) + 93;
+          mode = "Direct Win";
+          step = "Step 1";
+          isWinRound = true;
+          if (currentWinCount >= winStreakLimit) {
+            state = "LOSS_PHASE";
+            currentWinCount = 0;
+            currentLossStep = 0;
+          }
+        } 
+        else if (state === "LOSS_PHASE") {
+          currentLossStep++;
+          target = (Math.random() * (2.30 - 1.60) + 1.60).toFixed(2);
+          safe = (target - 0.20).toFixed(2);
+          acc = Math.floor(Math.random() * 6) + 90;
+          mode = "Backup Level";
+          step = "Step " + currentLossStep;
+          isWinRound = false;
+          if (currentLossStep >= lossStreakLimit) {
+            state = "RECOVERY";
+          }
+        } 
+        else if (state === "RECOVERY") {
+          target = (Math.random() * (3.10 - 2.10) + 2.10).toFixed(2);
+          safe = (target - 0.30).toFixed(2);
+          acc = "99";
+          mode = "Mega Recovery";
+          step = "Step " + (lossStreakLimit + 1);
+          isWinRound = true;
+          // সাইকেল আবার রিসেট
+          state = "WIN_PHASE";
+          winStreakLimit = Math.floor(Math.random() * 2) + 5;
+          lossStreakLimit = Math.floor(Math.random() * 2) + 2;
+        }
+
+        // ১. সিগন্যাল আপডেট ও ডিসপ্লে
+        document.getElementById("statusBadge").className = "status-badge status-active";
+        document.getElementById("statusBadge").innerText = "রাউন্ড লাইভ";
+        document.getElementById("targetOdd").innerText = target + "x";
+        document.getElementById("safeOdd").innerText = safe + "x";
+        document.getElementById("accVal").innerText = acc + "%";
+        document.getElementById("modeText").innerText = mode;
+        document.getElementById("stepText").innerText = step;
+        document.getElementById("resultBox").style.display = "none";
+
+        // কাউন্টডাউন (১৫ সেকেন্ড)
+        for(let s = 15; s > 0; s--) {
+          document.getElementById("timerText").innerText = `ফলাফলের জন্য অপেক্ষা করুন: ${s}s`;
+          await sleep(1000);
+        }
+
+        // ২. রেজাল্ট প্রদর্শন
+        const resBox = document.getElementById("resultBox");
+        resBox.style.display = "block";
+        if (isWinRound) {
+          let crash = (parseFloat(target) + (Math.random() * 1.5 + 0.3)).toFixed(2);
+          resBox.className = "result-box res-win";
+          resBox.innerText = `✅ WIN! বিমান উড়েছে ${crash}x পর্যন্ত`;
+        } else {
+          let crash = (Math.random() * (1.35 - 1.05) + 1.05).toFixed(2);
+          resBox.className = "result-box res-loss";
+          resBox.innerText = `❌ MISSED! ক্র্যাশ করেছে ${crash}x এ (${step} ফেল)`;
+        }
+
+        document.getElementById("statusBadge").className = "status-badge status-waiting";
+        document.getElementById("statusBadge").innerText = "পরবর্তী রাউন্ড";
+
+        // পরবর্তী রাউন্ডের বিরতি (২০ সেকেন্ড)
+        for(let s = 20; s > 0; s--) {
+          document.getElementById("timerText").innerText = `নতুন সিগন্যাল আসছে: ${s}s`;
+          await sleep(1000);
+        }
+      }
+    }
+  </script>
+</body>
+  </html>
