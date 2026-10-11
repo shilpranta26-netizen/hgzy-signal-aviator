@@ -3,38 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WinGo 30s Auto-Clock Sync Predictor</title>
+  <title>WinGo 30s Real Sync AI</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #0b0f19; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 12px; }
-    .main-box { background: #161f30; border: 1px solid #2d3d5a; border-radius: 16px; width: 100%; max-width: 420px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
+    .main-box { background: #161f30; border: 1px solid #2d3d5a; border-radius: 16px; width: 100%; max-width: 420px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
     
-    h2 { color: #f43f5e; font-size: 20px; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
+    h2 { color: #f43f5e; font-size: 21px; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
     p.sub { font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
 
     /* Inputs */
-    .field-label { font-size: 12px; color: #94a3b8; text-align: left; display: block; margin-bottom: 5px; font-weight: 600; }
+    .field-label { font-size: 12px; color: #94a3b8; text-align: left; display: block; margin-bottom: 4px; font-weight: 600; }
     .input-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0a1120; color: #fff; font-size: 16px; margin-bottom: 12px; text-align: center; outline: none; }
     .input-box:focus { border-color: #f43f5e; }
-    .btn-submit { width: 100%; padding: 13px; background: #e11d48; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; }
+    .btn-submit { width: 100%; padding: 13px; background: #e11d48; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; }
     .btn-submit:active { transform: scale(0.98); }
     .err-text { color: #fb7185; font-size: 12px; margin-top: 8px; display: none; }
 
-    /* Signal Room */
+    /* Dashboard */
     #dashboardScreen { display: none; }
     
-    .period-card { background: #0a1120; border: 1px solid #1e293b; border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; text-align: left; }
+    .period-card { background: #0a1120; border: 1px solid #1e293b; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; text-align: left; }
     .p-title { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
-    .p-num { font-size: 18px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; }
+    .p-num { font-size: 19px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; }
 
-    .timer-card { background: #0a1120; border: 1px solid #1e293b; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
-    .timer-val { font-size: 40px; font-weight: 900; color: #f59e0b; }
+    .timer-card { background: #0a1120; border: 1px solid #1e293b; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .timer-val { font-size: 44px; font-weight: 900; color: #f59e0b; }
 
-    /* Bet Alert */
     .bet-alert { background: linear-gradient(90deg, #ef4444, #f97316); color: #fff; font-size: 15px; font-weight: 800; padding: 8px; border-radius: 8px; margin-bottom: 10px; }
 
-    .pred-card { background: #0a1120; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
-    .pred-badge { display: inline-block; padding: 8px 22px; border-radius: 20px; font-size: 22px; font-weight: 900; margin: 6px 0; }
+    .pred-card { background: #0a1120; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
+    .pred-badge { display: inline-block; padding: 8px 24px; border-radius: 20px; font-size: 22px; font-weight: 900; margin: 6px 0; }
     .badge-green { background: #064e3b; color: #34d399; border: 1px solid #059669; }
     .badge-red { background: #4c0519; color: #fb7185; border: 1px solid #e11d48; }
 
@@ -50,22 +49,25 @@
 </head>
 <body>
 
-  <!-- ১. লগইন ও অটো-সিঙ্ক বক্স -->
+  <!-- লগইন ও ম্যানুয়াল সিঙ্ক বক্স -->
   <div class="main-box" id="loginScreen">
-    <h2>WINGO 30S AUTO SYNC</h2>
-    <p class="sub">পিরিয়ডের ৪ ডিজিট বসানো মাত্র টাইমার স্বয়ংক্রিয়ভাবে মিলে যাবে</p>
+    <h2>WINGO 30S REAL-SYNC</h2>
+    <p class="sub">গেমে যা দেখাচ্ছে হুবহু তা বসিয়ে ইনস্ট্যান্ট সিঙ্ক করুন</p>
 
-    <label class="field-label">গেমের পিরিয়ডের শেষের ৪ ডিজিট দিন (যেমন: ২০৬০):</label>
+    <label class="field-label">গেমের পিরিয়ডের শেষ ৪ সংখ্যা (যেমন: ২০৬০):</label>
     <input type="number" id="last4Input" class="input-box" placeholder="উদা: 2060">
 
-    <label class="field-label">পাসওয়ার্ড দিন:</label>
+    <label class="field-label">গেমে বর্তমানে কত সেকেন্ড চলছে (১ থেকে ৩০):</label>
+    <input type="number" id="secInput" class="input-box" placeholder="উদা: 14" min="1" max="30">
+
+    <label class="field-label">অ্যাক্সেস পাসওয়ার্ড:</label>
     <input type="password" id="passInput" class="input-box" placeholder="পাসওয়ার্ড লিখুন...">
 
-    <button class="btn-submit" onclick="syncClockAndStart()">CONNECT PREDICTOR</button>
-    <div id="errText" class="err-text">সঠিক ৪ ডিজিট এবং পাসওয়ার্ড দিন!</div>
+    <button class="btn-submit" onclick="syncAndStart()">SYNC & START</button>
+    <div id="errText" class="err-text">সঠিক তথ্য ও পাসওয়ার্ড দিন!</div>
   </div>
 
-  <!-- ২. লাইভ সিগন্যাল ড্যাশবোর্ড -->
+  <!-- লাইভ ড্যাশবোর্ড -->
   <div class="main-box" id="dashboardScreen">
     <h2>WINGO 30S PREDICTOR</h2>
 
@@ -74,7 +76,7 @@
       <div id="periodDisplay" class="p-num">2026101010005XXXX</div>
     </div>
 
-    <!-- রিয়েল-টাইম টাইমার -->
+    <!-- হুবহু সিঙ্কড টাইমার -->
     <div class="timer-card">
       <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">গেম লাইভ কাউন্টডাউন</div>
       <div id="timerDisplay" class="timer-val">00:30</div>
@@ -107,27 +109,30 @@
     var ACCESS_PASS = "HGZY777";
     var prefixPeriod = "2026101010005";
     var current4Digits = 2060;
-    var lastProcessedRound = -1;
+    var currentSeconds = 30;
+    var timerInterval = null;
 
-    // ৭-৮ উইন এবং ২-৩ লস প্যাটার্ন
-    var winTarget = Math.floor(Math.random() * 2) + 7;
-    var lossTarget = Math.floor(Math.random() * 2) + 2;
+    // ৭-৮ উইন এবং ২-৩ লস সাইকেল
+    var winTarget = Math.floor(Math.random() * 2) + 7; // ৭ বা ৮ বার
+    var lossTarget = Math.floor(Math.random() * 2) + 2; // ২ বা ৩ বার
     var winCount = 0;
     var lossCount = 0;
     var cycleState = "WIN_PHASE";
 
-    function syncClockAndStart() {
+    function syncAndStart() {
       var pass = document.getElementById("passInput").value;
       var last4 = document.getElementById("last4Input").value.trim();
+      var secVal = parseInt(document.getElementById("secInput").value);
 
-      if (pass === ACCESS_PASS && last4.length >= 3) {
+      if (pass === ACCESS_PASS && last4.length >= 3 && !isNaN(secVal) && secVal >= 1 && secVal <= 30) {
         current4Digits = parseInt(last4);
+        currentSeconds = secVal;
 
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("dashboardScreen").style.display = "block";
         
         generateSignal();
-        runServerClock();
+        startExactClock();
       } else {
         document.getElementById("errText").style.display = "block";
       }
@@ -185,6 +190,7 @@
     function showResult() {
       var res = document.getElementById("resultBox");
       res.style.display = "block";
+      document.getElementById("betAlert").style.display = "none";
 
       if (cycleState === "LOSS_PHASE") {
         res.className = "result-alert res-loss";
@@ -195,35 +201,33 @@
       }
     }
 
-    // প্রতি ২৫০ মিলি-সেকেন্ড পর পর ঘড়ি যাচাই করে আসল গেমের সেকেন্ডের সাথে মিলিয়ে রাখা
-    function runServerClock() {
-      setInterval(function() {
-        var now = new Date();
-        var sec = now.getSeconds();
+    function startExactClock() {
+      if (timerInterval) clearInterval(timerInterval);
 
-        // ৩০ সেকেন্ড সাইকেল ক্যালকুলেশন
-        var remaining = sec < 30 ? (30 - sec) : (60 - sec);
-        var currentCycleIndex = Math.floor(now.getTime() / 30000);
+      // প্রথম সেকেন্ড সাথে সাথে দেখানো
+      var sStr = currentSeconds < 10 ? "0" + currentSeconds : currentSeconds;
+      document.getElementById("timerDisplay").innerText = "00:" + sStr;
 
-        var sStr = remaining < 10 ? "0" + remaining : remaining;
-        document.getElementById("timerDisplay").innerText = "00:" + sStr;
+      timerInterval = setInterval(function() {
+        currentSeconds--;
 
-        // শেষ ৫ সেকেন্ডে বেট লক
-        if (remaining <= 5 && remaining > 0) {
-          document.getElementById("betAlert").innerText = "🔒 বেট লক! রেজাল্ট প্রসেসিং হচ্ছে...";
+        if (currentSeconds <= 5 && currentSeconds > 0) {
+          document.getElementById("betAlert").innerText = "🔒 বেট লক! অপেক্ষা করুন...";
         }
 
-        // নতুন রাউন্ড আসলে স্বয়ংক্রিয়ভাবে পিরিয়ড বৃদ্ধি ও নতুন সিগন্যাল তৈরি
-        if (lastProcessedRound !== -1 && lastProcessedRound !== currentCycleIndex) {
+        if (currentSeconds <= 0) {
           showResult();
-          current4Digits++;
+          current4Digits++; // রাউন্ড ১ বৃদ্ধি
+          currentSeconds = 30; // পরবর্তী রাউন্ড ফুল ৩০ সেকেন্ড
+
           setTimeout(function() {
             generateSignal();
           }, 1500);
         }
 
-        lastProcessedRound = currentCycleIndex;
-      }, 250);
+        var s = currentSeconds < 10 ? "0" + currentSeconds : currentSeconds;
+        document.getElementById("timerDisplay").innerText = "00:" + s;
+      }, 1000);
     }
   </script>
 </body>
